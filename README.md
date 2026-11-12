@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# eatrovert_ — Personal Landing Page
 
-## Getting Started
+Situs personal branding ala "slide deck interaktif" untuk **@eatrovert_** (mukbang & food creator).
+Kerangka interaksi terinspirasi milo.gg; identitas visual: hitam + grid, font Roboto/Roboto Mono, aksen tomat.
 
-First, run the development server:
+**Stack:** Next.js 16 · TypeScript · Tailwind 4 · **100% statis, tanpa backend** — deploy gratis di Vercel.
+
+## Struktur penting
+
+| File | Isi |
+|---|---|
+| `app/content.ts` | **SEMUA KONTEN** — slide, sticker, link sosmed, warna tema |
+| `app/components/Experience.tsx` | Kanvas utama: drag = pan, scroll = slide, pinch/ctrl+scroll = zoom |
+| `app/components/Deck.tsx` | Deck slide (tumpukan kartu + pagination + CTA) |
+| `app/components/Typewriter.tsx` | Efek ketik per slide (sekali main per slide) |
+| `app/components/StickerBoard.tsx` | Sticker drag smooth (transform compositor-only) + badge lapar + bubble dialog |
+| `app/layout.tsx` | SEO: metadata, OG, JSON-LD Person/ProfilePage |
+| `public/og.png` | Gambar share (1200×630) — sumbernya `public/og-source.html` |
+
+## Pola "content-as-behavior" (sticker)
+
+Perilaku klik sticker ditentukan **keyword di `name`** / field opsional (di `content.ts`):
+- mengandung `ramen` → +1 Lapar (badge muncul saat hover sticker ramen)
+- `youtube` / `instagram` / `tiktok` / `whatsapp` / `threads` → buka link platform masing-masing (logo asli transparan di `public/stickers/`)
+- mengandung `headset` → play/pause lagu Novo Amor (YouTube IFrame API, daftar lagu di `TRACKS`)
+- mengandung `lotso` → audio dialog Toy Story + bubble text di atasnya
+- punya field `bubbles` → bubble text acak di atas sticker (mascot)
+
+Nambah sticker fungsional = nambah 1 baris di `STICKERS`.
+
+## Mengubah konten
+
+1. Edit `app/content.ts` (slide/sticker/link/warna).
+2. `pnpm build` → push ke GitHub → Vercel deploy otomatis.
+3. Foto asli untuk sticker: upload ke `public/`, lalu ganti emoji dengan `<img>` di `StickerBoard` (slot sudah disiapkan secara konsep — tinggal render `s.image` bila ada).
+
+## Jalankan lokal
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev      # http://localhost:3000
+pnpm build && pnpm start   # produksi
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploy (Vercel, tanpa backend)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Push repo ini ke GitHub.
+2. [vercel.com/new](https://vercel.com/new) → import repo → framework: Next.js (auto) → Deploy.
+3. Custom domain: Project → Settings → Domains → tambahkan `eatrovert.my.id`.
+4. Di registrar domain: A record `@` → `76.76.76.76`, atau CNAME `www` → `cname.vercel-dns.com`.
+5. Selesai — setiap push ke branch utama = deploy otomatis.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Batas MVP (tanpa backend)
 
-## Learn More
+- Counter lapar & posisi sticker = **per device** (localStorage) — total tampil sebagai badge di sticker ramen saat di-hover.
+- Tidak ada realtime multiplayer (kursor live, arrivals) — menunggu fase 2 (Supabase Realtime/PartyKit bila diinginkan).
+- Tidak ada admin editor — konten via `content.ts`.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Riset & blueprint lengkap: [docs/milo-gg-deep-dive.md](docs/milo-gg-deep-dive.md)

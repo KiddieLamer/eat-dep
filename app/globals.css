@@ -1,26 +1,330 @@
 @import "tailwindcss";
 
+/* ── TOKEN TEMA — hitam ala milo.gg, aksen tomat ── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #050505;
+  --grid: rgba(255, 255, 255, 0.055);
+  --ink: #f2f2f2;
+  --accent: #e4572e;
+  --card: #0a0a0a;
+  --muted: #9ca3af;
+  --border: #ffffff;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-roboto);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-roboto), system-ui, sans-serif;
+}
+
+/* teks slide — monospace ala milo.gg */
+.deck-text {
+  font-family: var(--font-roboto-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ── DUNIA: grid halus di atas hitam ── */
+.world-grid {
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 48px 48px;
+  transition: transform 0.12s ease-out;
+}
+.panning { cursor: grabbing !important; }
+
+/* ── DECK — kartu hitam border putih persis milo ── */
+.deck-card {
+  position: relative;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: clamp(1.25rem, 6cqw, 2rem);
+  padding: 20px 22px 18px;
+  height: min(400px, 74vh);
+  display: flex;
+  flex-direction: column;
+  transform-origin: bottom center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
+}
+.deck-under {
+  position: absolute;
+  inset: 0;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: clamp(1.25rem, 6cqw, 2rem);
+  transform-origin: bottom center;
+  pointer-events: none;
+}
+.deck-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 2px solid var(--border);
+  background: transparent;
+  color: var(--ink);
+  transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+.deck-btn:hover:not(:disabled) { background: #fff; color: #000; transform: scale(1.08); }
+.deck-btn:disabled { opacity: 0.35; }
+
+/* CTA putih ala milo (kiri-bawah kartu) */
+.cta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #000000;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 9px 22px;
+  border-radius: 999px;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.cta-pill:hover { background: #d4d4d4; transform: translateY(-1px); }
+
+/* ── STICKER ── */
+.sticker {
+  position: absolute;
+  cursor: grab;
+  background: #fff;
+  border-radius: 18px;
+  padding: 10px;
+  border: 2.5px solid #fff;
+  box-shadow: 4px 6px 14px rgba(0, 0, 0, 0.45);
+  line-height: 1;
+  user-select: none;
+  touch-action: none;
+  will-change: transform;
+  transition: box-shadow 0.15s ease;
+}
+.sticker:hover { box-shadow: 6px 9px 18px rgba(0, 0, 0, 0.6); }
+.sticker:active { cursor: grabbing; }
+/* inline width img sticker harus menang atas preflight max-width:100% */
+.sticker img { max-width: none; display: block; }
+/* saat digenggam: sedikit membesar + bayangan lebih dalam (compositor-only) */
+.sticker.is-dragging {
+  scale: 1.12;
+  cursor: grabbing;
+  box-shadow: 10px 14px 30px rgba(0, 0, 0, 0.65);
+  transition: scale 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+}
+/* PNG transparan (mis. Lotso) — tanpa tile putih */
+.sticker-bare {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  /* outline putih mengikuti siluet gambar (8 arah drop-shadow 0-blur)
+     + bayangan hitam lembut di akhir untuk kedalaman */
+  filter:
+    drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+    drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
+    drop-shadow(1.5px 1.5px 0 #fff) drop-shadow(-1.5px -1.5px 0 #fff)
+    drop-shadow(1.5px -1.5px 0 #fff) drop-shadow(-1.5px 1.5px 0 #fff)
+    drop-shadow(0 10px 18px rgba(0, 0, 0, 0.55));
+}
+.sticker-bare:hover {
+  box-shadow: none;
+  filter:
+    drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+    drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
+    drop-shadow(1.5px 1.5px 0 #fff) drop-shadow(-1.5px -1.5px 0 #fff)
+    drop-shadow(1.5px -1.5px 0 #fff) drop-shadow(-1.5px 1.5px 0 #fff)
+    drop-shadow(0 12px 22px rgba(0, 0, 0, 0.7));
+}
+/* sticker tanpa outline putih (mis. TikTok & matahari) — cukup bayangan lembut */
+.sticker-bare.sticker-no-outline {
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.55));
+}
+.sticker-bare.sticker-no-outline:hover {
+  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.7));
+}
+
+/* badge counter lapar (ala auraCount milo — di sticker saat hover) */
+.lapar-badge {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: var(--accent);
+  color: #fff;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-family: var(--font-roboto-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  z-index: 30;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+.sticker-bounce { animation: sticker-bounce 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes sticker-bounce {
+  0% { scale: 1; }
+  40% { scale: 1.25; rotate: -6deg; }
+  70% { scale: 0.92; }
+  100% { scale: 1; }
+}
+
+/* ── BUBBLE DIALOG — layer mandiri di atas sticker (tanpa outline) ── */
+.sticker-bubble {
+  position: absolute;
+  width: max-content;
+  max-width: 250px;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-family: var(--font-roboto-mono), ui-monospace, monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--ink);
+  text-align: left;
+  white-space: pre-wrap;
+  z-index: 60;
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  transform: translate(-50%, calc(-100% - 14px));
+  animation: bubble-pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.sticker-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: var(--border);
+}
+/* mode bubble di bawah sticker (sticker dekat atas layar) — tail menghadap atas */
+.sticker-bubble--below::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: var(--border);
+}
+@keyframes bubble-pop {
+  0% { opacity: 0; transform: translate(-50%, calc(-100% - 6px)) scale(0.92); }
+  100% { opacity: 1; transform: translate(-50%, calc(-100% - 14px)) scale(1); }
+}
+/* link di dalam bubble (mis. "tonton ↗" pada sticker vt) */
+.sticker-bubble a.bubble-link {
+  pointer-events: auto;
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+.sticker-bubble a.bubble-link:hover { text-decoration: underline; }
+
+/* ── POPUP FOTO POLAROID (sticker kamera) ── */
+.photo-pop {
+  position: absolute;
+  z-index: 70;
+}
+.photo-pop-card {
+  width: 240px;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 8px 6px;
+  cursor: pointer;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.65);
+  animation: photo-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.photo-pop-card img {
+  display: block;
+  width: 100%;
+  /* tinggi tetap — semua frame polaroid sama besar (gambar di-crop tengah) */
+  height: 240px;
+  object-fit: cover;
+  border-radius: 5px;
+  pointer-events: none;
+}
+.photo-pop-caption {
+  display: block;
+  text-align: center;
+  font-family: var(--font-roboto-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  padding-top: 6px;
+}
+@keyframes photo-pop {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ── TYPEWRITER ── */
+.tw-pre { white-space: pre-wrap; }
+.tw-cursor {
+  display: inline-block;
+  color: var(--ink);
+  animation: blink 0.9s steps(1) infinite;
+  margin-left: 1px;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ── HUD ── */
+.hud-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+  transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+a.hud-chip:hover { transform: translateY(-2px); background: #fff; color: #000; }
+.hud-chip img { display: block; }
+
+.hud-hint {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+  font-family: var(--font-roboto-mono), ui-monospace, monospace;
+}
+
+/* chip "now playing" musik */
+.now-playing {
+  position: fixed;
+  left: 16px;
+  bottom: 56px;
+  z-index: 40;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ink);
+  font-family: var(--font-roboto-mono), ui-monospace, monospace;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* ── PARTIKEL +1 ── */
+.float-up {
+  position: absolute;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--accent);
+  pointer-events: none;
+  z-index: 40;
+  animation: float-up 1.05s ease-out forwards;
+}
+@keyframes float-up {
+  0% { transform: translate(-50%, -50%); opacity: 1; }
+  100% { transform: translate(-50%, calc(-50% - 56px)); opacity: 0; }
 }
